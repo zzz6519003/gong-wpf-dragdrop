@@ -1,0 +1,69 @@
+#summary Drop Handler example
+
+= Drop Handler Example =
+
+A drop handler allows you to specify logic to control a drop. The responsibility will usually be delegated to your !ViewModel by setting the !DropHandler attached property:
+
+{{{
+<ListBox Grid.Column="1" Grid.Row="1" ItemsSource="{Binding Collection}" 
+         dd:DragDrop.IsDragSource="True" dd:DragDrop.IsDropTarget="True"
+         dd:DragDrop.DropHandler="{Binding}"/>
+}}}
+
+Here we're binding the drop handler to the current !DataContext, which will usually be your !ViewModel.
+
+You handle the drop in your !ViewModel by implementing the IDropTarget interface:
+
+{{{
+class ExampleViewModel : IDropTarget
+{
+    public ObservableCollection<ExampleItemViewModel> Items;
+
+    void IDropTarget.DragOver(DropInfo dropInfo)
+    {
+        ExampleItemViewModel sourceItem = dropInfo.Data as ExampleItemViewModel;
+        ExampleItemViewModel targetItem = dropInfo.TargetItem as ExampleItemViewModel;
+
+        if (sourceItem != null && targetItem != null && targetItem.CanAcceptChildren)
+        {
+            dropInfo.DropTargetAdorner = DropTargetAdorners.Highlight;
+            dropInfo.Effects = DragDropEffects.Copy;
+        }
+    }
+
+    void IDropTarget.Drop(DropInfo dropInfo)
+    {
+        ExampleItemViewModel sourceItem = dropInfo.Data as ExampleItemViewModel;
+        ExampleItemViewModel targetItem = dropInfo.TargetItem as ExampleItemViewModel;
+        targetItem.Children.Add(sourceItem);
+    }
+}
+
+class ExampleItemViewModel
+{
+    public bool CanAcceptChildren { get; set; }
+    public ObservableCollection<ExampleItemViewModel> Children { get; private set; }
+}
+}}}
+
+The IDropTarget interface defines two methods:
+
+ * !DragOver is called repeatedly whilst the drag is over the control. It allows you to give visual feedback to the user indicating what the action of the drop will be.
+ * Drop is called when the user drops the data on the control.
+
+Both of these methods accept a single DropInfo parameter which contains information related to the drag/drop, and in the case of !DragOver is used to return the current state  of the drag to the framework.
+
+Let's take a look at those two methods in detail. First, DragOver:
+
+{{{
+void IDropTarget.DragOver(DropInfo dropInfo)
+{
+    ExampleItemViewModel sourceItem = dropInfo.Data as ExampleItemViewModel;
+    ExampleItemViewModel targetItem = dropInfo.TargetItem as ExampleItemViewModel;
+}}}
+
+The first thing the !DragOver method does is check that it can handle the data types involved in the drag.
+
+The dropInfo.Data property contains the data being dragged. If the control that was the source of the drag is a bound control, this will be the object that the dragged item was bound to. Here we're trying to cast it to an ExampleItemViewModel.
+
+The dropInfo.TargetItem property contains the object that the item currently under the mouse cursor is bound to. Again, we're trying to cast it to an ExampleItemViewModel.
