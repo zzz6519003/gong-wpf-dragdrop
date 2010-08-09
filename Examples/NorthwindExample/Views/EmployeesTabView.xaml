@@ -28,7 +28,8 @@
                      IsSynchronizedWithCurrentItem="True" AutoGenerateColumns="False" SelectionMode="Single"
                      dd:DragDrop.IsDragSource="True" dd:DragDrop.IsDropTarget="True"
                      dd:DragDrop.DropHandler="{Binding}" 
-                     dd:DragDrop.DragAdornerTemplate="{StaticResource EmployeeDragTemplate}">
+                     dd:DragDrop.DragAdornerTemplate="{x:Null}"
+                     dd:DragDrop.EffectNoneAdornerTemplate="{x:Null}">
             <tk:DataGrid.Columns>
                 <tk:DataGridTextColumn Header="First Name" Binding="{Binding FirstName, Mode=OneWay}"/>
                 <tk:DataGridTextColumn Header="Last Name" Binding="{Binding LastName, Mode=OneWay}"/>
@@ -39,6 +40,6 @@
         <ListBox Grid.Row="3" ItemsSource="{Binding SubOrdinates}" DisplayMemberPath="FullName"
                  SelectionMode="Extended" dd:DragDrop.IsDragSource="True" dd:DragDrop.IsDropTarget="True"
                  dd:DragDrop.DropHandler="{Binding}" 
-                 dd:DragDrop.DragAdornerTemplate="{StaticResource EmployeeDragTemplate}"/>
+                 dd:DragDrop.DragAdornerTemplate="{x:Null}"/>
     </Grid>
 </UserControl>

@@ -58,7 +58,7 @@ namespace GongSolutions.Wpf.DragDrop.Utilities
             return null;
         }
 
-        public static UIElement GetItemContainerAt(this ItemsControl itemsControl, Point position, 
+        public static UIElement GetItemContainerAt(this ItemsControl itemsControl, Point position,
                                                    Orientation searchDirection)
         {
             Type itemContainerType = GetItemContainerType(itemsControl);
@@ -100,17 +100,17 @@ namespace GongSolutions.Wpf.DragDrop.Utilities
         {
             // There is no safe way to get the item container type for an ItemsControl. 
             // First hard-code the types for the common ItemsControls.
-            if (itemsControl is ListView)
+            if (itemsControl.GetType().IsAssignableFrom(typeof(ListBox)))
             {
-                return typeof(ListViewItem);
+                return typeof(ListBoxItem);
             }
-            else if (itemsControl is TreeView)
+            else if (itemsControl.GetType().IsAssignableFrom(typeof(TreeView)))
             {
                 return typeof(TreeViewItem);
             }
-            else if (itemsControl is ListBox)
+            else if (itemsControl.GetType().IsAssignableFrom(typeof(ListView)))
             {
-                return typeof(ListBoxItem);
+                return typeof(ListViewItem);
             }
 
             // Otherwise look for the control's ItemsPresenter, get it's child panel and the first 
@@ -142,27 +142,28 @@ namespace GongSolutions.Wpf.DragDrop.Utilities
         public static Orientation GetItemsPanelOrientation(this ItemsControl itemsControl)
         {
             ItemsPresenter itemsPresenter = itemsControl.GetVisualDescendent<ItemsPresenter>();
-            DependencyObject itemsPanel = VisualTreeHelper.GetChild(itemsPresenter, 0);
-            PropertyInfo orientationProperty = itemsPanel.GetType().GetProperty("Orientation", typeof(Orientation));
+            if (itemsPresenter != null)
+            {
+                DependencyObject itemsPanel = VisualTreeHelper.GetChild(itemsPresenter, 0);
+                PropertyInfo orientationProperty = itemsPanel.GetType().GetProperty("Orientation", typeof(Orientation));
 
-            if (orientationProperty != null)
-            {
-                return (Orientation)orientationProperty.GetValue(itemsPanel, null);
+                if (orientationProperty != null)
+                {
+                    return (Orientation)orientationProperty.GetValue(itemsPanel, null);
+                }
             }
-            else
-            {
-                // Make a guess!
-                return Orientation.Vertical;
-            }
+
+            // Make a guess!
+            return Orientation.Vertical;
         }
 
         public static IEnumerable GetSelectedItems(this ItemsControl itemsControl)
         {
-            if (itemsControl is MultiSelector)
+            if (itemsControl.GetType().IsAssignableFrom(typeof(MultiSelector)))
             {
                 return ((MultiSelector)itemsControl).SelectedItems;
             }
-            else if (itemsControl is ListBox)
+            else if (itemsControl.GetType().IsAssignableFrom(typeof(ListBox)))
             {
                 ListBox listBox = (ListBox)itemsControl;
 
@@ -175,11 +176,11 @@ namespace GongSolutions.Wpf.DragDrop.Utilities
                     return listBox.SelectedItems;
                 }
             }
-            else if (itemsControl is TreeView)
+            else if (itemsControl.GetType().IsAssignableFrom(typeof(TreeView)))
             {
                 return Enumerable.Repeat(((TreeView)itemsControl).SelectedItem, 1);
             }
-            else if (itemsControl is Selector)
+            else if (itemsControl.GetType().IsAssignableFrom(typeof(Selector)))
             {
                 return Enumerable.Repeat(((Selector)itemsControl).SelectedItem, 1);
             }
@@ -188,8 +189,8 @@ namespace GongSolutions.Wpf.DragDrop.Utilities
                 return Enumerable.Empty<object>();
             }
         }
-        
-        static UIElement GetClosest(ItemsControl itemsControl, List<DependencyObject> items, 
+
+        static UIElement GetClosest(ItemsControl itemsControl, List<DependencyObject> items,
                                     Point position, Orientation searchDirection)
         {
             UIElement closest = null;

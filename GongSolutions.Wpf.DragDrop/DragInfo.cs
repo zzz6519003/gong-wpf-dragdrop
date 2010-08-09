@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
@@ -108,7 +109,7 @@ namespace GongSolutions.Wpf.DragDrop
         /// <remarks>
         /// If the control that initated the drag is unbound or not an ItemsControl, this will be null.
         /// </remarks>
-        public IEnumerable SourceCollection { get; private set; }
+        public IEnumerable SourceCollection { get; set; }
 
         /// <summary>
         /// Gets the object that a dragged item is bound to.
@@ -143,5 +144,10 @@ namespace GongSolutions.Wpf.DragDrop
         /// will hold a ListBoxItem.
         /// </remarks>
         public UIElement VisualSourceItem { get; private set; }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public Action<object, GiveFeedbackEventArgs> GiveFeedback { get; set; }
     }
 }
