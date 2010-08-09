@@ -28,6 +28,7 @@ namespace GongSolutions.Wpf.DragDrop.Utilities
 
             while (item != null)
             {
+                //if (item.GetType().IsAssignableFrom(type)) return item;
                 if (item.GetType() == type) return item;
                 item = VisualTreeHelper.GetParent(item);
             }
