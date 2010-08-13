@@ -48,12 +48,12 @@ namespace GongSolutions.Wpf.DragDrop
             target.SetValue(EffectNoneAdornerTemplateProperty, value);
         }
 
-        public static DataTemplate GetEffectCopyAdornerTemplate(UIElement target)
+        public static DataTemplate GetEffectCopyAdornerTemplate(UIElement target, string destinationText)
         {
             var template = (DataTemplate)target.GetValue(EffectCopyAdornerTemplateProperty);
 
             if (template == null)
-                template = CreateDefaultEffectDataTemplate(IconFactory.EffectCopy, "Copy to");
+                template = CreateDefaultEffectDataTemplate(IconFactory.EffectCopy, "Copy to", destinationText);
 
             return template;
         }
@@ -63,12 +63,12 @@ namespace GongSolutions.Wpf.DragDrop
             target.SetValue(EffectCopyAdornerTemplateProperty, value);
         }
 
-        public static DataTemplate GetEffectMoveAdornerTemplate(UIElement target)
+        public static DataTemplate GetEffectMoveAdornerTemplate(UIElement target, string destinationText)
         {
             var template = (DataTemplate)target.GetValue(EffectMoveAdornerTemplateProperty);
 
             if (template == null)
-                template = CreateDefaultEffectDataTemplate(IconFactory.EffectMove, "Move to");
+                template = CreateDefaultEffectDataTemplate(IconFactory.EffectMove, "Move to", destinationText);
 
             return template;
         }
@@ -78,12 +78,12 @@ namespace GongSolutions.Wpf.DragDrop
             target.SetValue(EffectMoveAdornerTemplateProperty, value);
         }
 
-        public static DataTemplate GetEffectLinkAdornerTemplate(UIElement target)
+        public static DataTemplate GetEffectLinkAdornerTemplate(UIElement target, string destinationText)
         {
             var template = (DataTemplate)target.GetValue(EffectLinkAdornerTemplateProperty);
 
             if (template == null)
-                template = CreateDefaultEffectDataTemplate(IconFactory.EffectLink, "Link to");
+                template = CreateDefaultEffectDataTemplate(IconFactory.EffectLink, "Link to", destinationText);
 
             return template;
         }
@@ -333,7 +333,7 @@ namespace GongSolutions.Wpf.DragDrop
             }
             else
             {
-                // Create a default adornor of the item you're dragging if there's isn't a customer one set
+                // Create a default adornor of the item you're dragging if there's isn't a custom one set
                 RenderTargetBitmap bitmap = new RenderTargetBitmap(
                     Convert.ToInt32(m_DragInfo.VisualSourceItem.RenderSize.Width),
                     Convert.ToInt32(m_DragInfo.VisualSourceItem.RenderSize.Height),
@@ -343,7 +343,6 @@ namespace GongSolutions.Wpf.DragDrop
                 bitmap.Freeze();
 
                 Rectangle rect = new Rectangle();
-                //rect.Fill = new ImageBrush(bitmap);
                 rect.Fill = new VisualBrush(m_DragInfo.VisualSourceItem).CloneCurrentValue();
                 rect.Width = m_DragInfo.VisualSourceItem.RenderSize.Width;
                 rect.Height = m_DragInfo.VisualSourceItem.RenderSize.Height;
@@ -358,9 +357,9 @@ namespace GongSolutions.Wpf.DragDrop
             }
         }
 
-        static void CreateEffectAdorner(DragDropEffects effect)
+        static void CreateEffectAdorner(DropInfo dropInfo)
         {
-            DataTemplate template = GetEffectAdornerTemplate(m_DragInfo.VisualSource, effect);
+            DataTemplate template = GetEffectAdornerTemplate(m_DragInfo.VisualSource, dropInfo.Effects, dropInfo.DestinationText);
 
             if (template != null)
             {
@@ -378,6 +377,11 @@ namespace GongSolutions.Wpf.DragDrop
 
         private static DataTemplate CreateDefaultEffectDataTemplate(BitmapImage effectIcon, string effectText)
         {
+            return CreateDefaultEffectDataTemplate(effectIcon, effectText, string.Empty);
+        }
+
+        private static DataTemplate CreateDefaultEffectDataTemplate(BitmapImage effectIcon, string effectText, string destinationText)
+        {
             // Add icon
             var imageFactory = new FrameworkElementFactory(typeof(Image));
             imageFactory.SetValue(Image.SourceProperty, effectIcon);
@@ -385,18 +389,27 @@ namespace GongSolutions.Wpf.DragDrop
             imageFactory.SetValue(FrameworkElement.WidthProperty, 12.0);
             imageFactory.SetValue(FrameworkElement.MarginProperty, new Thickness(0.0, 0.0, 3.0, 0.0));
 
-            // Add text
-            var textBlockFactory = new FrameworkElementFactory(typeof(TextBlock));
-            textBlockFactory.SetValue(TextBlock.TextProperty, effectText);
-            textBlockFactory.SetValue(TextBlock.FontSizeProperty, 11.0);
-            textBlockFactory.SetValue(TextBlock.ForegroundProperty, Brushes.Blue);
+            // Add effect text
+            var effectTextBlockFactory = new FrameworkElementFactory(typeof(TextBlock));
+            effectTextBlockFactory.SetValue(TextBlock.TextProperty, effectText);
+            effectTextBlockFactory.SetValue(TextBlock.FontSizeProperty, 11.0);
+            effectTextBlockFactory.SetValue(TextBlock.ForegroundProperty, Brushes.Blue);
+
+            // Add destination text
+            var destinationTextBlockFactory = new FrameworkElementFactory(typeof(TextBlock));
+            destinationTextBlockFactory.SetValue(TextBlock.TextProperty, destinationText);
+            destinationTextBlockFactory.SetValue(TextBlock.FontSizeProperty, 11.0);
+            destinationTextBlockFactory.SetValue(TextBlock.ForegroundProperty, Brushes.DarkBlue);
+            destinationTextBlockFactory.SetValue(TextBlock.MarginProperty, new Thickness(3, 0, 0, 0));
+            destinationTextBlockFactory.SetValue(TextBlock.FontWeightProperty, FontWeights.DemiBold);
 
             // Create containing panel
             var stackPanelFactory = new FrameworkElementFactory(typeof(StackPanel));
             stackPanelFactory.SetValue(StackPanel.OrientationProperty, Orientation.Horizontal);
             stackPanelFactory.SetValue(FrameworkElement.MarginProperty, new Thickness(2.0));
             stackPanelFactory.AppendChild(imageFactory);
-            stackPanelFactory.AppendChild(textBlockFactory);
+            stackPanelFactory.AppendChild(effectTextBlockFactory);
+            stackPanelFactory.AppendChild(destinationTextBlockFactory);
 
             // Add border
             var borderFactory = new FrameworkElementFactory(typeof(Border));
@@ -419,18 +432,18 @@ namespace GongSolutions.Wpf.DragDrop
             return template;
         }
 
-        static DataTemplate GetEffectAdornerTemplate(UIElement target, DragDropEffects effect)
+        static DataTemplate GetEffectAdornerTemplate(UIElement target, DragDropEffects effect, string destinationText)
         {
             switch (effect)
             {
                 case DragDropEffects.All:
                     return null;
                 case DragDropEffects.Copy:
-                    return GetEffectCopyAdornerTemplate(target);
+                    return GetEffectCopyAdornerTemplate(target, destinationText);
                 case DragDropEffects.Link:
-                    return GetEffectLinkAdornerTemplate(target);
+                    return GetEffectLinkAdornerTemplate(target, destinationText);
                 case DragDropEffects.Move:
-                    return GetEffectMoveAdornerTemplate(target);
+                    return GetEffectMoveAdornerTemplate(target, destinationText);
                 case DragDropEffects.None:
                     return GetEffectNoneAdornerTemplate(target);
                 case DragDropEffects.Scroll:
@@ -559,7 +572,6 @@ namespace GongSolutions.Wpf.DragDrop
 
         static void DragSource_QueryContinueDrag(object sender, QueryContinueDragEventArgs e)
         {
-            //Console.WriteLine("Inside QueryContinueDrag: {0}", e.Action);
             if (e.Action == DragAction.Cancel || e.EscapePressed)
             {
                 DragAdorner = null;
@@ -648,7 +660,7 @@ namespace GongSolutions.Wpf.DragDrop
             // Set the drag effect adorner if there is one
             if (EffectAdorner == null && m_DragInfo != null)
             {
-                CreateEffectAdorner(dropInfo.Effects);
+                CreateEffectAdorner(dropInfo);
             }
 
             if (EffectAdorner != null)

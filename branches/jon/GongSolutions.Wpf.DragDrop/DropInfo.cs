@@ -193,5 +193,10 @@ namespace GongSolutions.Wpf.DragDrop
         /// Gets th orientation of the current drop target.
         /// </summary>
         public Orientation VisualTargetOrientation { get; private set; }
+        
+        /// <summary>
+        /// Gets and sets the text displayed in the DropDropEffects adorner.
+        /// </summary>
+        public string DestinationText { get; set; }
     }
 }
