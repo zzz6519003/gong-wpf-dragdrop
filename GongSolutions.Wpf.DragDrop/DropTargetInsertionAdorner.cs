@@ -30,6 +30,7 @@ namespace GongSolutions.Wpf.DragDrop
                 if (DropInfo.VisualTargetItem != null)
                 {
                     itemParent = ItemsControl.ItemsControlFromItemContainer(DropInfo.VisualTargetItem);
+                    //Console.WriteLine("PARENT: " + itemParent.ToString());
                 }
                 else
                 {
@@ -38,13 +39,17 @@ namespace GongSolutions.Wpf.DragDrop
 
                 int index = Math.Min(DropInfo.InsertIndex, itemParent.Items.Count - 1);
                 UIElement itemContainer = (UIElement)itemParent.ItemContainerGenerator.ContainerFromIndex(index);
-
+                
+                //Console.WriteLine("CONTAINER: " + itemContainer.ToString());
+                
                 if (itemContainer != null)
                 {
                     Rect itemRect = new Rect(itemContainer.TranslatePoint(new Point(), AdornedElement),
                         itemContainer.RenderSize);
                     Point point1, point2;
                     double rotation = 0;
+
+                    //Console.WriteLine("Insert index: " + DropInfo.InsertIndex);
 
                     if (DropInfo.VisualTargetOrientation == Orientation.Vertical)
                     {

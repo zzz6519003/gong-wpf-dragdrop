@@ -145,9 +145,5 @@ namespace GongSolutions.Wpf.DragDrop
         /// </remarks>
         public UIElement VisualSourceItem { get; private set; }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        public Action<object, GiveFeedbackEventArgs> GiveFeedback { get; set; }
     }
 }
