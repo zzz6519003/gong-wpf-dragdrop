@@ -695,6 +695,7 @@ namespace GongSolutions.Wpf.DragDrop
                 DefaultDropHandler.Drop(dropInfo);
             }
 
+            Mouse.OverrideCursor = null;
             e.Handled = true;
         }
 
