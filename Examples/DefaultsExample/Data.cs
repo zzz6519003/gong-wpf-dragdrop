@@ -90,6 +90,11 @@ namespace DefaultsExample
 
         public string Caption { get; private set; }
         public ObservableCollection<TreeNode> Children { get; private set; }
+
+        public override string ToString()
+        {
+            return Caption;
+        }
     }
 
     class GroupedItem : INotifyPropertyChanged

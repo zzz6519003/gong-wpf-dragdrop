@@ -65,30 +65,45 @@ namespace GongSolutions.Wpf.DragDrop.Utilities
 
             if (itemContainerType != null)
             {
-                LineGeometry line;
-
-                switch (searchDirection)
+                Geometry hitTestGeometry;
+                
+                if (typeof(TreeViewItem).IsAssignableFrom(itemContainerType))
                 {
-                    case Orientation.Horizontal:
-                        line = new LineGeometry(new Point(0, position.Y), new Point(itemsControl.RenderSize.Width, position.Y));
-                        break;
-                    case Orientation.Vertical:
-                        line = new LineGeometry(new Point(position.X, 0), new Point(position.X, itemsControl.RenderSize.Height));
-                        break;
-                    default:
-                        throw new ArgumentException("Invalid value for searchDirection");
+                    //Console.WriteLine("Is TreeViewItem");
+                    hitTestGeometry = new LineGeometry(new Point(0, position.Y), new Point(itemsControl.RenderSize.Width, position.Y));
+                    //hitTestGeometry = new RectangleGeometry(new Rect(new Point(0, 0),
+                    //                                                 new Point(itemsControl.RenderSize.Width, itemsControl.RenderSize.Height)));
+
+                }
+                else
+                {
+                    switch (searchDirection)
+                    {
+                        case Orientation.Horizontal:
+                            hitTestGeometry = new LineGeometry(new Point(0, position.Y), new Point(itemsControl.RenderSize.Width, position.Y));
+                            break;
+                        case Orientation.Vertical:
+                            hitTestGeometry = new LineGeometry(new Point(position.X, 0), new Point(position.X, itemsControl.RenderSize.Height));
+                            break;
+                        default:
+                            throw new ArgumentException("Invalid value for searchDirection");
+                    }
                 }
 
                 List<DependencyObject> hits = new List<DependencyObject>();
 
+                //Console.WriteLine("Performing hit test - {0}", itemsControl.ToString());
                 VisualTreeHelper.HitTest(itemsControl, null,
                     result =>
                     {
                         DependencyObject itemContainer = result.VisualHit.GetVisualAncestor(itemContainerType);
-                        if (itemContainer != null) hits.Add(itemContainer);
+                        if (itemContainer != null && !hits.Contains(itemContainer) && ((UIElement)itemContainer).IsVisible == true)
+                            hits.Add(itemContainer);
                         return HitTestResultBehavior.Continue;
                     },
-                    new GeometryHitTestParameters(line));
+                    new GeometryHitTestParameters(hitTestGeometry));
+
+                //Console.WriteLine("Hits = {0}", hits.Count);
 
                 return GetClosest(itemsControl, hits, position, searchDirection);
             }
@@ -193,6 +208,8 @@ namespace GongSolutions.Wpf.DragDrop.Utilities
         static UIElement GetClosest(ItemsControl itemsControl, List<DependencyObject> items,
                                     Point position, Orientation searchDirection)
         {
+            //Console.WriteLine("GetClosest - {0}", itemsControl.ToString());
+
             UIElement closest = null;
             double closestDistance = double.MaxValue;
 
@@ -204,15 +221,25 @@ namespace GongSolutions.Wpf.DragDrop.Utilities
                 {
                     Point p = uiElement.TransformToAncestor(itemsControl).Transform(new Point(0, 0));
                     double distance = double.MaxValue;
-
-                    switch (searchDirection)
+                    
+                    if (itemsControl is TreeView)
                     {
-                        case Orientation.Horizontal:
-                            distance = Math.Abs(position.X - p.X);
-                            break;
-                        case Orientation.Vertical:
-                            distance = Math.Abs(position.Y - p.Y);
-                            break;
+                        double xDiff = position.X - p.X;
+                        double yDiff = position.Y - p.Y;
+                        double hyp = Math.Sqrt(Math.Pow(xDiff, 2d) + Math.Pow(yDiff, 2d));
+                        distance = Math.Abs(hyp);
+                    }
+                    else
+                    {
+                        switch (searchDirection)
+                        {
+                            case Orientation.Horizontal:
+                                distance = Math.Abs(position.X - p.X);
+                                break;
+                            case Orientation.Vertical:
+                                distance = Math.Abs(position.Y - p.Y);
+                                break;
+                        }
                     }
 
                     if (distance < closestDistance)
@@ -222,7 +249,7 @@ namespace GongSolutions.Wpf.DragDrop.Utilities
                     }
                 }
             }
-
+            
             return closest;
         }
     }
