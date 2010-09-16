@@ -45,6 +45,7 @@ namespace GongSolutions.Wpf.DragDrop
             {
                 ItemsControl itemsControl = (ItemsControl)sender;
                 Point position = e.GetPosition(itemsControl);
+
                 UIElement item = itemsControl.GetItemContainerAt(position);
                 bool directlyOverItem = item != null;
 
@@ -64,7 +65,7 @@ namespace GongSolutions.Wpf.DragDrop
                     InsertIndex = itemParent.ItemContainerGenerator.IndexFromContainer(item);
                     TargetCollection = itemParent.ItemsSource ?? itemParent.Items;
 
-                    if (directlyOverItem)
+                    if (directlyOverItem || typeof(TreeViewItem).IsAssignableFrom(item.GetType()))
                     {
                         TargetItem = itemParent.ItemContainerGenerator.ItemFromContainer(item);
                         VisualTargetItem = item;
@@ -72,11 +73,27 @@ namespace GongSolutions.Wpf.DragDrop
 
                     if (VisualTargetOrientation == Orientation.Vertical)
                     {
-                        if (e.GetPosition(item).Y > item.RenderSize.Height / 2) InsertIndex++;
+                        if (e.GetPosition(item).Y > item.RenderSize.Height / 2)
+                        {
+                            InsertIndex++;
+                            InsertPosition = RelativeInsertPosition.AfterTargetItem;
+                        }
+                        else
+                        {
+                            InsertPosition = RelativeInsertPosition.BeforeTargetItem;
+                        }
                     }
                     else
                     {
-                        if (e.GetPosition(item).X > item.RenderSize.Width / 2) InsertIndex++;
+                        if (e.GetPosition(item).X > item.RenderSize.Width / 2)
+                        {
+                            InsertIndex++;
+                            InsertPosition = RelativeInsertPosition.AfterTargetItem;
+                        }
+                        else
+                        {
+                            InsertPosition = RelativeInsertPosition.BeforeTargetItem;
+                        }
                     }
                 }
                 else
@@ -198,5 +215,16 @@ namespace GongSolutions.Wpf.DragDrop
         /// Gets and sets the text displayed in the DropDropEffects adorner.
         /// </summary>
         public string DestinationText { get; set; }
+
+        /// <summary>
+        /// Gets the relative position the item will be inserted to compared to the TargetItem
+        /// </summary>
+        public RelativeInsertPosition InsertPosition { get; private set; }
+    }
+
+    public enum RelativeInsertPosition
+    {
+        BeforeTargetItem,
+        AfterTargetItem
     }
 }
