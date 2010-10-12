@@ -82,6 +82,11 @@ namespace GongSolutions.Wpf.DragDrop
                         {
                             InsertPosition = RelativeInsertPosition.BeforeTargetItem;
                         }
+
+                        if (e.GetPosition(item).Y > item.RenderSize.Height * 0.25 && e.GetPosition(item).Y < item.RenderSize.Height * 0.75)
+                        {
+                            InsertPosition |= RelativeInsertPosition.TargetItemCenter;
+                        }
                     }
                     else
                     {
@@ -93,6 +98,11 @@ namespace GongSolutions.Wpf.DragDrop
                         else
                         {
                             InsertPosition = RelativeInsertPosition.BeforeTargetItem;
+                        }
+
+                        if (e.GetPosition(item).X > item.RenderSize.Width * 0.25 && e.GetPosition(item).X < item.RenderSize.Width * 0.75)
+                        {
+                            InsertPosition |= RelativeInsertPosition.TargetItemCenter;
                         }
                     }
                 }
@@ -222,9 +232,11 @@ namespace GongSolutions.Wpf.DragDrop
         public RelativeInsertPosition InsertPosition { get; private set; }
     }
 
+    [Flags]
     public enum RelativeInsertPosition
     {
-        BeforeTargetItem,
-        AfterTargetItem
+        BeforeTargetItem = 0,
+        AfterTargetItem = 1,
+        TargetItemCenter = 2
     }
 }
