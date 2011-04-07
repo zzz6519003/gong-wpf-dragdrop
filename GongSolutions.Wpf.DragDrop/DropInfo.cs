@@ -38,7 +38,8 @@ namespace GongSolutions.Wpf.DragDrop
             string dataFormat = DragDrop.DataFormat.Name;
             Data = (e.Data.GetDataPresent(dataFormat)) ? e.Data.GetData(dataFormat) : e.Data;
             DragInfo = dragInfo;
-
+            KeyStates = e.KeyStates;
+            
             VisualTarget = sender as UIElement;
 
             if (sender is ItemsControl)
@@ -230,6 +231,11 @@ namespace GongSolutions.Wpf.DragDrop
         /// Gets the relative position the item will be inserted to compared to the TargetItem
         /// </summary>
         public RelativeInsertPosition InsertPosition { get; private set; }
+
+        /// <summary>
+        /// Gets a flag enumeration indicating the current state of the SHIFT, CTRL, and ALT keys, as well as the state of the mouse buttons.
+        /// </summary>
+        public DragDropKeyStates KeyStates { get; private set; }
     }
 
     [Flags]

@@ -603,7 +603,7 @@ namespace GongSolutions.Wpf.DragDrop
         {
             DropInfo dropInfo = new DropInfo(sender, e, m_DragInfo);
             IDropTarget dropHandler = GetDropHandler((UIElement)sender);
-
+            
             if (dropHandler != null)
             {
                 dropHandler.DragOver(dropInfo);
