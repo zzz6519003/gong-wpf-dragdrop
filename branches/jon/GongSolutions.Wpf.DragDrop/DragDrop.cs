@@ -460,7 +460,10 @@ namespace GongSolutions.Wpf.DragDrop
             if (hit == null)
                 return false;
             else
-                return hit.VisualHit.GetVisualAncestor<System.Windows.Controls.Primitives.ScrollBar>() != null;
+            {
+                var scrollBar = hit.VisualHit.GetVisualAncestor<System.Windows.Controls.Primitives.ScrollBar>();
+                return scrollBar != null && scrollBar.Visibility == Visibility.Visible;
+            }
         }
 
         static void Scroll(DependencyObject o, DragEventArgs e)
@@ -501,7 +504,7 @@ namespace GongSolutions.Wpf.DragDrop
                 m_DragInfo = null;
                 return;
             }
-
+            
             m_DragInfo = new DragInfo(sender, e);
 
             // If the sender is a list box that allows multiple selections, ensure that clicking on an 
