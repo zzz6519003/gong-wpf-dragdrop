@@ -633,7 +633,7 @@ namespace GongSolutions.Wpf.DragDrop
                 if (m_DragInfo != null && GetDragAdornerTemplate(m_DragInfo.VisualSource) != null)
                     _adornerPos.Offset((_adornerSize.Width * -0.5), (_adornerSize.Height * -0.9));
                 else
-                    _adornerPos.Offset(0, (_adornerSize.Height * -0.5));
+                    _adornerPos.Offset(m_DragInfo.PositionInDraggedItem.X * -1, m_DragInfo.PositionInDraggedItem.Y * -1);
 
                 DragAdorner.MousePosition = _adornerPos;
                 DragAdorner.InvalidateVisual();
