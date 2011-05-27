@@ -44,6 +44,9 @@ namespace GongSolutions.Wpf.DragDrop
 
                 if (item != null)
                 {
+                    // Remember the relative position of the item being dragged
+                    PositionInDraggedItem = e.GetPosition(item);
+
                     ItemsControl itemParent = ItemsControl.ItemsControlFromItemContainer(item);
 
                     SourceCollection = itemParent.ItemsSource ?? itemParent.Items;
@@ -66,6 +69,11 @@ namespace GongSolutions.Wpf.DragDrop
                     SourceCollection = itemsControl.ItemsSource ?? itemsControl.Items;
                 }
             }
+            else
+            {
+                if (sender is UIElement)
+                    PositionInDraggedItem = e.GetPosition((UIElement)sender);
+            }
 
             if (SourceItems == null)
             {
@@ -86,6 +94,11 @@ namespace GongSolutions.Wpf.DragDrop
         /// Gets the position of the click that initiated the drag, relative to <see cref="VisualSource"/>.
         /// </summary>
         public Point DragStartPosition { get; private set; }
+
+        /// <summary>
+        /// Gets the point where the cursor was relative to the item being dragged when the drag was started.
+        /// </summary>
+        public Point PositionInDraggedItem { get; private set; }
 
         /// <summary>
         /// Gets or sets the allowed effects for the drag.
