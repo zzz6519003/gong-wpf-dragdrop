@@ -40,8 +40,16 @@ namespace GongSolutions.Wpf.DragDrop
             if (sender is ItemsControl)
             {
                 ItemsControl itemsControl = (ItemsControl)sender;
-                UIElement item = itemsControl.GetItemContainer((UIElement)e.OriginalSource);
 
+                var sourceItem = e.OriginalSource as UIElement; // If we can't cast object as a UIElement it might be a FrameworkContentElement, if so try and use its parent.
+                if (sourceItem == null && e.OriginalSource is FrameworkContentElement)
+                {
+                    sourceItem = ((FrameworkContentElement)e.OriginalSource).Parent as UIElement;
+                }
+
+                UIElement item = null;
+                if (sourceItem != null) item = itemsControl.GetItemContainer(sourceItem);
+                
                 if (item != null)
                 {
                     // Remember the relative position of the item being dragged
