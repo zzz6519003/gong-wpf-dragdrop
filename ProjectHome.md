@@ -1,0 +1,1 @@
+gong-wpf-dragdrop has moved to https://github.com/punker76/gong-wpf-dragdrop
